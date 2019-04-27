@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include "peterson.h"
+//#include "peterson.h"
+#include "bakery.h"
 
 #define N_READERS	3
 #define N_WRITERS	1
@@ -15,18 +16,21 @@ void *reader(void *arg){
 	i = (long int)arg;
 	while(1){
 		sem_wait(&mutex);
-		sem_wait(&r_db);
+		//sem_wait(&r_db);
+		lock(0,i);
+		
 		sem_wait(&mutex_rc);
 		rc++;
-		if (rc == 1) sem_wait(&w_db);
+		if (rc == 1) lock(1,i); //sem_wait(&w_db);
 		sem_post(&mutex_rc);
-		sem_post(&r_db);
+		//sem_post(&r_db);
+		unlock(0,i);
 		sem_post(&mutex);
 		reads++;
 		printf("(R) thread %d reading the database... (%d readers, %d reads, %d writes)\n", i, rc, reads, writes);
 		sem_wait(&mutex_rc);
 		rc--;
-		if (rc == 0) sem_post(&w_db);
+		if (rc == 0) unlock(1,i); //sem_post(&w_db);
 		sem_post(&mutex_rc);
 		printf("(R) thread %d using data...\n", i);
 	}
@@ -39,23 +43,32 @@ void *writer(void *arg){
 	while(1){
 		sem_wait(&mutex_wc);
 		wc++;
-		if (wc == 1) sem_wait(&r_db);
+		if (wc == 1) lock(0,i);//sem_wait(&r_db);
 		sem_post(&mutex_wc);
 		printf("(W) thread %d preparing data...\n", i);
-		sem_wait(&w_db);
+		//sem_wait(&w_db);
+		lock(1,i);
 		writes++;
 		printf("(W) thread %d writing to the database... (%d reads, %d writes)\n", i, reads, writes);
-		sem_post(&w_db);
+		//sem_post(&w_db);
+		unlock(1,i);
 		sem_wait(&mutex_wc);
 		wc--;
-		if (wc == 0) sem_post(&r_db);
+		if (wc == 0) unlock(0,i);//sem_post(&r_db);
 		sem_post(&mutex_wc);
 	}
 }
 
 int main(void){
+
+	//printf("aqui\n");
 	long int i;
 	pthread_t readers[N_READERS], writers[N_WRITERS];
+
+	int *prcs = (int *) malloc(2 * sizeof(int));
+	prcs[0] = N_READERS;
+	prcs[1] = N_WRITERS;
+	//initialize(2, prcs);
 
 	sem_init(&mutex_rc, 0, 1);
 	sem_init(&mutex_wc, 0, 1);	
