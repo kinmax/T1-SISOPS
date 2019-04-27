@@ -68,7 +68,7 @@ int main(void){
 	int *prcs = (int *) malloc(2 * sizeof(int));
 	prcs[0] = N_READERS;
 	prcs[1] = N_WRITERS;
-	//initialize(2, prcs);
+	initialize_bakery(2, prcs);
 
 	sem_init(&mutex_rc, 0, 1);
 	sem_init(&mutex_wc, 0, 1);	

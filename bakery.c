@@ -1,6 +1,6 @@
 #include "bakery.h"
 
-void initialize(int n_locks, int *processes)
+void initialize_bakery(int n_locks, int *processes)
 {
     int i, j;
     procs = (int *) malloc(n_locks * sizeof(int));
