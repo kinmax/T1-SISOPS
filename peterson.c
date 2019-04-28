@@ -1,13 +1,13 @@
 #include "peterson.h"
 
-void initialize(int processes)
+void initialize_peterson(int processes)
 {
     procs = processes;
     flag = (int *) malloc(processes * sizeof(int));
     turn = (int *) malloc(processes * sizeof(int));
 }
 
-void lock(int p)
+void lock_peterson(int p)
 {
     int i, j, counter = 0;
     for(i = 0; i < procs; i++)
@@ -21,14 +21,14 @@ void lock(int p)
                 counter++;
             }
         }
-        while(counter != (procs-1) && turn[i] == p)
+        while(!(counter == procs-1 || turn[i] != p))
         {
             
         }
     }
 }
 
-void unlock(int p)
+void unlock_peterson(int p)
 {
     flag[p] = -1;
 }

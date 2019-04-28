@@ -1,53 +1,49 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "bakery.h"
 
-void initialize_bakery(int n_locks, int *processes)
+void initialize_bakery(int processes)
 {
-    int i, j;
-    procs = (int *) malloc(n_locks * sizeof(int));
-    choosing = (int *) malloc(n_locks * sizeof(int));
-    number = (int *) malloc(n_locks * sizeof(int));
-    for(i = 0; i < n_locks; i++)
+    int i;
+    choosing = (int *) malloc(processes * sizeof(int));
+    number = (int *) malloc(processes * sizeof(int));
+    
+    for(i = 0; i < processes; i++)
     {
-        choosing[i] = (int *) malloc(processes[i] * sizeof(int));
-        number[i] = (int *) malloc(processes[i] * sizeof(int));
-        for(j = 0; j < processes[i]; j++)
-        {
-            choosing[i][j] = 0;
-            number[i][j] = 0;
-        }
+        choosing[i] = 0;
+        number[i] = 0;
     }
 }
 
-void lock(int lock_id, int p)
+void lock_bakery(int p)
 {
-    int n_procs = procs[lock_id];
     int max, i;
-    max = -1;
-    choosing[lock_id][p] = 1;
-    for(i = 0; i <= n_procs-1; i++)
+    max = number[0];
+    choosing[p] = 1;
+    for(i = 0; i < procs; i++)
     {
-        if(number[lock_id][i] > max)
+        if(number[i] > max)
         {
-            max = number[lock_id][i];
+            max = number[i];
         }
     }
-    number[lock_id][p] = max + 1;
-    choosing[lock_id][p] = 0;
-    for(i = 0; i < n_procs-1; i++)
+    number[p] = max + 1;
+    choosing[p] = 0;
+    for(i = 0; i < procs; i++)
     {
-        while(choosing[lock_id][i] == 1)
+        while(choosing[i] == 1)
         {
 
         }
 
-        while(number[lock_id][i] != 0 && ((number[lock_id][i] < number[lock_id][p]) || ((number[lock_id][i] == number[lock_id][p]) && (i < p))))
+        while(number[i] != 0 && ((number[i] < number[p]) || ((number[i] == number[p]) && (i < p))))
         {
 
         }
     }
 }
 
-void unlock(int lock_id, int p)
+void unlock_bakery(int p)
 {
-    number[lock_id][p] = 0;
+    number[p] = 0;
 }

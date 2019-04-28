@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include "bakery.h"
 
 #define N_READERS	3
 #define N_WRITERS	1
@@ -14,14 +13,14 @@ void *reader(void *arg){
 
 	i = (long int)arg;
 	while(1){
-		lock_bakery(i);
+		sem_wait(&mutex);
 		sem_wait(&r_db);
 		sem_wait(&mutex_rc);
 		rc++;
 		if (rc == 1) sem_wait(&w_db);
 		sem_post(&mutex_rc);
 		sem_post(&r_db);
-		unlock_bakery(i);
+		sem_post(&mutex);
 		reads++;
 		printf("(R) thread %d reading the database... (%d readers, %d reads, %d writes)\n", i, rc, reads, writes);
 		sem_wait(&mutex_rc);
@@ -56,12 +55,10 @@ void *writer(void *arg){
 int main(void){
 	long int i;
 	pthread_t readers[N_READERS], writers[N_WRITERS];
-	
-	initialize_bakery(N_READERS);
 
 	sem_init(&mutex_rc, 0, 1);
 	sem_init(&mutex_wc, 0, 1);	
-	//sem_init(&mutex, 0, 1);
+	sem_init(&mutex, 0, 1);
 	sem_init(&w_db, 0, 1);
 	sem_init(&r_db, 0, 1);
 

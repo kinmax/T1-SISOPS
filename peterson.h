@@ -4,6 +4,6 @@ int procs;
 int *turn;
 int *flag;
 
-void initialize(int processes);
-void lock(int p);
-void unlock(int p);
+void initialize_peterson(int processes);
+void lock_peterson(int p);
+void unlock_peterson(int p);

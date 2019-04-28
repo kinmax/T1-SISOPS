@@ -1,10 +1,14 @@
+#ifndef _bakery_h_
+#define _bakery_h_
+
 #include <stdlib.h>
 
-int locks;
-int *procs;
-int **choosing;
-int **number;
+int procs;
+int *choosing;
+int *number;
 
-void initialize_bakery(int n_locks, int *processes);
-void lock(int lock_id, int p);
-void unlock(int lock_id, int p);
+void initialize_bakery(int processes);
+void lock_bakery(int p);
+void unlock_bakery(int p);
+
+#endif
