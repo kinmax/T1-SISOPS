@@ -1,3 +1,8 @@
+/*
+KIN MAX PIAMOLINI GUSMÃO
+MARCELO DRUMM
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -19,21 +24,12 @@ void produtor(void *arg)
     i = (long int)arg;
     while(1)
     {
-        //lock_bakery(i);
-        sem_wait(&mutex);
-        lock_bakery(i);
-        sem_post(&mutex);
         sem_wait(&empty);
-        
+        lock_bakery(i);
         buffer++;
         printf("(P) Thread %ld produziu. Buffer = %d\n", i, buffer);
-       
-        sem_post(&full);
-        sem_wait(&mutex);
-        unlock_bakery(i);
-        sem_post(&mutex);
-        //unlock_bakery(i);
-        
+        unlock_bakery(i); 
+        sem_post(&full); 
     }
 }
 
@@ -43,21 +39,12 @@ void consumidor(void *arg)
     i = (long int)arg;
     while(1)
     {
-        //lock_bakery(PRODUTORES+i);
-        sem_wait(&mutex);
-        lock_bakery(PRODUTORES+i);
-        sem_post(&mutex); 
         sem_wait(&full);
-               
+        lock_bakery(PRODUTORES+i);
         buffer--;
         printf("(C) Thread %ld consumiu. Buffer = %d\n", i, buffer);
-        
-        sem_post(&empty);
-        sem_wait(&mutex);
         unlock_bakery(PRODUTORES+i);
-        sem_post(&mutex);
-        //unlock_bakery(PRODUTORES+i);
-        
+        sem_post(&empty);
     }
 }
 
@@ -75,10 +62,10 @@ int main(void)
 	sem_init(&empty, 0, 10);
 
 	for(i = 0; i < CONSUMIDORES; i++)
-		pthread_create(&consumers[i], NULL, produtor, (void *)i);
+		pthread_create(&consumers[i], NULL, consumidor, (void *)i);
 
 	for(i = 0; i < PRODUTORES; i++)
-		pthread_create(&producers[i], NULL, consumidor, (void *)i);
+		pthread_create(&producers[i], NULL, produtor, (void *)i);
 
 	pthread_exit(NULL);	
 	return(0);

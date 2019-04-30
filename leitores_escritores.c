@@ -1,3 +1,8 @@
+/*
+KIN MAX PIAMOLINI GUSMÃO
+MARCELO DRUMM
+*/
+
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -6,7 +11,7 @@
 #define N_READERS	3
 #define N_WRITERS	1
 
-sem_t mutex_rc, mutex_wc, mutex, w_db, r_db;
+sem_t mutex_rc, mutex_wc, w_db, r_db;
 int rc = 0, wc = 0, reads = 0, writes = 0;
 
 void *reader(void *arg){
@@ -60,8 +65,7 @@ int main(void){
 	initialize_bakery(N_READERS);
 
 	sem_init(&mutex_rc, 0, 1);
-	sem_init(&mutex_wc, 0, 1);	
-	//sem_init(&mutex, 0, 1);
+	sem_init(&mutex_wc, 0, 1);
 	sem_init(&w_db, 0, 1);
 	sem_init(&r_db, 0, 1);
 
